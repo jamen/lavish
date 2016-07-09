@@ -4,9 +4,10 @@
   "version": "0.0.0-alpha1",
   "description": "More efficient \"npm install\" using globals dirs + symlinking.",
   "main": "lib",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jamen/lavish"
+  "repository": "jamen/lavish",
+  "bin": {
+    "lavish": "./bin/lavish",
+    "lavish-shim": "./bin/lavish-shim"
   },
   "scripts": {
     "test": "tape test"
@@ -23,15 +24,15 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.4.0",
+    "async-each": "^1.0.0",
+    "bluebird": "^3.4.1",
+    "git-clone": "^0.1.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "promise-routine": "^1.0.0",
-    "rimraf": "^2.5.2",
-    "safe-write-file": "^1.1.0",
-    "safe-write-stream": "^1.0.4",
-    "semver": "^5.1.0",
+    "object-assign": "^4.1.0",
+    "semver": "^5.2.0",
     "tar-stream": "^1.5.2",
+    "uuid": "^2.0.2",
     "validate-npm-package-name": "^2.2.2"
   }
 }

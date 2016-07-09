@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+var lavish = require('../lib');
+var cli = require('minimist')(process.argv.slice(2));
+
+console.log('Installing...');
+lavish.install(cli._, process.cwd()).then(function() {
+  console.log('Finished');
+});

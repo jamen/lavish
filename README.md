@@ -1,6 +1,8 @@
 # lavish
 > More efficient "npm install" using globals dirs + symlinking.
 
+Note: In early stages, may or may not be usable.
+
 ## Installation
 ```sh
 $ npm install -g lavish
