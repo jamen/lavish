@@ -13,12 +13,14 @@ npm install -g lavish
 ```
 
 ## Usage
-Install packages with the CLI:
+The CLI usage should be 100% compatible with `npm install`.
+
+Using the CLI directly:
 ```sh
 lavish <...packages>
 ```
 
-Using the shim as an alias.
+Using the CLI shim on `npm`:
 ```sh
 alias npm=lavish-shim
 ```

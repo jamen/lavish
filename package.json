@@ -10,7 +10,7 @@
     "lavish-shim": "./bin/lavish-shim"
   },
   "scripts": {
-    "test": "tape test"
+    "test": "eslint test lib bin; tape 'test/*.js' | tap-spec"
   },
   "private": false,
   "files": [
