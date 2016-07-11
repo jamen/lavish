@@ -53,11 +53,8 @@ var createBox = function(info, pkg) {
   });
 
   pkg.on('install', function() {
-    message('green', 'Installed');
-    setTimeout(function() {
-      base.remove(box);
-      screen.render();
-    }, 500);
+    base.remove(box);
+    screen.render();
   });
 
   pkg.on('new dep', function(manager, dep) {
@@ -69,8 +66,7 @@ var createBox = function(info, pkg) {
   });
 
   pkg.on('error', function(err) {
-    screen.destroy();
-    console.log(err);
+    message('red', 'Error: ' + err.message);
   });
 };
 
@@ -92,6 +88,6 @@ Promise.resolve(cli._).then(function(installs) {
     createBox(info, pkg);
     return pkg.install(cwd);
   });
-}).delay(750).then(function() {
+}).then(function() {
   screen.destroy();
 });
