@@ -4,6 +4,8 @@ var Promise = require('bluebird');
 var cli = require('minimist')(process.argv.slice(2));
 var cwd = process.cwd();
 var blessed = require('blessed');
+var fs = Promise.promisifyAll(require('fs'));
+var path = require('path');
 
 var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
 screen.title = 'lavish install';
@@ -67,13 +69,20 @@ var createBox = function(info, pkg) {
   });
 
   pkg.on('error', function(err) {
-    var error = '{red-fg}Error: ' + err.message + '{/red-fg}';
-    box.setContent(prefix + error);
-    screen.render();
+    screen.destroy();
+    console.log(err);
   });
 };
 
-Promise.resolve(cli._).map(function(id) {
+Promise.resolve(cli._).then(function(installs) {
+  if (installs.length) return installs;
+  return fs.readFileAsync(path.join(cwd, 'package.json')).then(function(data) {
+    var pkg = JSON.parse(data);
+    return Object.keys(pkg.dependencies).map(function(name) {
+      return name + '@' + pkg.dependencies[name];
+    });
+  });
+}).map(function(id) {
   var parts = id.split('@');
   var name = parts[0];
   var tag = parts[1] || 'local-latest';
@@ -84,5 +93,5 @@ Promise.resolve(cli._).map(function(id) {
     return pkg.install(cwd);
   });
 }).delay(750).then(function() {
-  process.exit(0);
+  screen.destroy();
 });
