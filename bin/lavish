@@ -1,8 +1,84 @@
 #!/usr/bin/env node
 var lavish = require('../lib');
+var Promise = require('bluebird');
 var cli = require('minimist')(process.argv.slice(2));
+var cwd = process.cwd();
+var blessed = require('blessed');
 
-console.log('Installing...');
-lavish.install(cli._, process.cwd()).then(function() {
-  console.log('Finished');
-}, console.error);
+var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
+screen.title = 'lavish install';
+
+var base = blessed.layout({
+  parent: screen,
+  top: 'center',
+  left: 'center',
+  width: '100%',
+  height: '100%',
+  padding: {left: 1, right: 1}
+});
+
+var createBox = function(info, pkg) {
+  var prefix = info.name + '@' + info.version + '\r\n';
+  var box = blessed.box({
+    width: '100%',
+    tags: true,
+    content: prefix + '{yellow-fg}Starting{/yellow-fg}',
+    padding: 1
+  });
+
+  base.append(box);
+
+  var message = function(color, x) {
+    box.setContent(prefix + '{' + color + '-fg}' + x + '{/' + color + '-fg}');
+    screen.render();
+  };
+
+  pkg.on('predownload', function() {
+    message('yellow', 'Downloading');
+  });
+
+  pkg.on('download', function() {
+    message('yellow', 'Installing');
+  });
+
+  pkg.on('prelink', function() {
+    message('blue', 'Linking');
+  });
+
+  pkg.on('link', function() {
+    message('green', 'Linked');
+  });
+
+  pkg.on('install', function() {
+    base.remove(box);
+    screen.render();
+  });
+
+  pkg.on('new dep', function(manager, dep) {
+    dep.info().then(function(info) {
+      var id = info.name + '@' + info.version;
+      message('yellow', 'Installing dependency ' + id);
+      createBox(info, dep);
+    });
+  });
+
+  pkg.on('error', function(err) {
+    var error = '{red-fg}Error: ' + err.message + '{/red-fg}';
+    box.setContent(prefix + error);
+    screen.render();
+  });
+};
+
+Promise.resolve(cli._).map(function(id) {
+  var parts = id.split('@');
+  var name = parts[0];
+  var tag = parts[1] || 'local-latest';
+  return lavish.select(name, tag);
+}).all().map(function(pkg) {
+  return pkg.info().then(function(info) {
+    createBox(info, pkg);
+    return pkg.install(cwd);
+  });
+}).delay(750).then(function() {
+  process.exit(0);
+});
