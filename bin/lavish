@@ -22,11 +22,12 @@ var createBox = function(info, pkg) {
   var box = blessed.box({
     width: '100%',
     tags: true,
-    content: prefix + '{yellow-fg}Starting{/yellow-fg}',
-    padding: 1
+    content: prefix + '{yellow-fg}Installing{/yellow-fg}',
+    padding: {bottom: 1}
   });
 
   base.append(box);
+  screen.render();
 
   var message = function(color, x) {
     box.setContent(prefix + '{' + color + '-fg}' + x + '{/' + color + '-fg}');
@@ -38,20 +39,23 @@ var createBox = function(info, pkg) {
   });
 
   pkg.on('download', function() {
-    message('yellow', 'Installing');
+    message('green', 'Downloaded');
   });
 
   pkg.on('prelink', function() {
-    message('blue', 'Linking');
+    message('yellow', 'Linking');
   });
 
   pkg.on('link', function() {
-    message('green', 'Linked');
+    message('blue', 'Linked');
   });
 
   pkg.on('install', function() {
-    base.remove(box);
-    screen.render();
+    message('green', 'Installed');
+    setTimeout(function() {
+      base.remove(box);
+      screen.render();
+    }, 500);
   });
 
   pkg.on('new dep', function(manager, dep) {
