@@ -1,7 +1,7 @@
 # lavish
-> More efficient "npm install" using globals dirs + symlinking.
+> Better "npm install" using global cache and symlinking.
 
-Lavish downloads a flat package structure, and uses symlinking for all dependencies.  After you download a package once or twice, it will symlink instantly from there on out.  This allows you to download less files and save time installing packages.
+Lavish downloads a flat package structure then uses symlinking for all dependencies.  After you download a package once or twice, it will symlink instantly from there on out.  This allows you to download less files and save time installing packages.
 
 ![Usage][usage-gif]
 

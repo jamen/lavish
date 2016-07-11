@@ -2,7 +2,7 @@
   "name": "lavish",
   "author": "Jamen Marzonie",
   "version": "0.0.0-alpha2",
-  "description": "More efficient \"npm install\" using globals dirs + symlinking.",
+  "description": "Better \"npm install\" using global cache and symlinking.",
   "main": "lib",
   "repository": "jamen/lavish",
   "bin": {
@@ -14,20 +14,22 @@
   },
   "private": false,
   "files": [
-    "lib"
+    "lib",
+    "bin"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^2.12.0",
+    "eslint-config-google": "^0.6.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.5.1"
+  },
   "license": "MIT",
   "dependencies": {
     "blessed": "^0.1.81",
     "bluebird": "^3.4.1",
-    "eslint": "^2.12.0",
-    "eslint-config-google": "^0.6.0",
     "json-assign": "^0.2.0",
     "mkdirp": "^0.5.1",
     "semver": "^5.2.0",
-    "tap-spec": "^4.1.1",
-    "tape": "^4.5.1",
     "tar-stream": "^1.5.2",
     "uuid": "^2.0.2"
   }
