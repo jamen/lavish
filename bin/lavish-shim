@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-. ./lavish
 if [ "$1" = "install" ] || [ "$1" = "i" ]; then
   lavish "${@:2}"
 else
-  npm "${@:2}"
+  npm "$@"
 fi
