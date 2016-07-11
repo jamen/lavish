@@ -1,7 +1,7 @@
 {
   "name": "lavish",
   "author": "Jamen Marzonie",
-  "version": "0.0.0-alpha2",
+  "version": "0.0.0-alpha3",
   "description": "Better \"npm install\" using global cache and symlinking.",
   "main": "lib",
   "repository": "jamen/lavish",
