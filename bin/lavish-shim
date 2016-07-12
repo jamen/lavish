@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if [ "$1" = "install" ] || [ "$1" = "i" ] || [ "$1" = "isntall" ]; then
+  lavish "${@:2}"
+else
+  npm "$@"
+fi

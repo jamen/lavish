@@ -1,19 +1,21 @@
 {
   "name": "lavish",
   "author": "Jamen Marzonie",
-  "version": "0.0.0-alpha1",
-  "description": "More efficient \"npm install\" using globals dirs + symlinking.",
+  "version": "0.0.0-alpha3",
+  "description": "Better \"npm install\" using global cache and symlinking.",
   "main": "lib",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jamen/lavish"
+  "repository": "jamen/lavish",
+  "bin": {
+    "lavish": "./bin/lavish",
+    "lavish-shim": "./bin/lavish-shim"
   },
   "scripts": {
-    "test": "tape test"
+    "test": "eslint test lib bin; tape 'test/*.js' | tap-spec"
   },
   "private": false,
   "files": [
-    "lib"
+    "lib",
+    "bin"
   ],
   "devDependencies": {
     "eslint": "^2.12.0",
@@ -23,15 +25,13 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.4.0",
-    "minimist": "^1.2.0",
+    "blessed": "^0.1.81",
+    "bluebird": "^3.4.1",
+    "deep-assign": "^2.0.0",
+    "json-assign": "^0.2.0",
     "mkdirp": "^0.5.1",
-    "promise-routine": "^1.0.0",
-    "rimraf": "^2.5.2",
-    "safe-write-file": "^1.1.0",
-    "safe-write-stream": "^1.0.4",
-    "semver": "^5.1.0",
+    "semver": "^5.2.0",
     "tar-stream": "^1.5.2",
-    "validate-npm-package-name": "^2.2.2"
+    "uuid": "^2.0.2"
   }
 }

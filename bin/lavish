@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+var lavish = require('../lib');
+var Promise = require('bluebird');
+var cwd = process.cwd();
+var blessed = require('blessed');
+var fs = Promise.promisifyAll(require('fs'));
+var path = require('path');
+var exec = Promise.promisify(require('child_process').exec);
+var cli = require('minimist')(process.argv.slice(2), {
+  boolean: ['global', 'save', 'save-dev', 'production'],
+  alias: {'global': 'g', 'save-dev': 'd', 'save': 's', 'p': 'production'}
+});
+
+var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
+screen.title = 'lavish install';
+
+var base = blessed.layout({
+  parent: screen,
+  top: 'center',
+  left: 'center',
+  width: '100%',
+  height: '100%',
+  padding: {left: 1, right: 1}
+});
+
+var createBox = function(info, pkg) {
+  var prefix = info.name + '@' + info.version + '\r\n';
+  var box = blessed.box({
+    width: '100%',
+    tags: true,
+    content: prefix + '{yellow-fg}Installing{/yellow-fg}',
+    padding: {bottom: 1}
+  });
+
+  base.append(box);
+  screen.render();
+
+  var message = function(color, x) {
+    box.setContent(prefix + '{' + color + '-fg}' + x + '{/' + color + '-fg}');
+    screen.render();
+  };
+
+  pkg.on('predownload', function() {
+    message('yellow', 'Downloading');
+  });
+
+  pkg.on('download', function() {
+    message('green', 'Downloaded');
+  });
+
+  pkg.on('prelink', function() {
+    message('yellow', 'Linking');
+  });
+
+  pkg.on('link', function() {
+    message('blue', 'Linked');
+  });
+
+  pkg.on('install', function() {
+    base.remove(box);
+    screen.render();
+  });
+
+  pkg.on('new dep', function(manager, dep) {
+    dep.info().then(function(info) {
+      var id = info.name + '@' + info.version;
+      message('yellow', 'Installing dependency ' + id);
+      createBox(info, dep);
+    });
+  });
+
+  pkg.on('error', function(err) {
+    message('red', 'Error: ' + err.message);
+  });
+};
+
+Promise.resolve(cli._).then(function(installs) {
+  if (installs.length) return installs;
+  return fs.readFileAsync(path.join(cwd, 'package.json')).then(function(data) {
+    var pkg = JSON.parse(data);
+    var installs = [];
+
+    if (pkg.dependencies) {
+      Object.keys(pkg.dependencies).forEach(function(name) {
+        installs.push(name + '@' + pkg.dependencies[name]);
+      });
+    }
+
+    if (pkg.devDependencies && !cli.production) {
+      Object.keys(pkg.devDependencies).forEach(function(name) {
+        installs.push(name + '@' + pkg.devDependencies[name]);
+      });
+    }
+
+    return installs;
+  });
+}).map(function(id) {
+  var parts = id.split('@');
+  var name = parts[0];
+  var tag = parts[1] || 'local-latest';
+  return lavish.select(name, tag);
+}).map(function(pkg) {
+  return Promise.all([pkg, exec('npm bin --global').then(function(data) {
+    return data.trim();
+  })]);
+}).map(function(items) {
+  var pkg = items[0];
+  var bin = items[1];
+  return pkg.info().then(function(info) {
+    createBox(info, pkg);
+    return pkg.install(cwd);
+  }).then(function() {
+    if (cli.global) {
+      return pkg.bin(bin);
+    }
+  }).then(function() {
+    return pkg.info();
+  });
+}).all().then(function(pkgs) {
+  if (cli.save || cli['save-dev']) {
+    var pkgJsonPath = path.join(cwd, 'package.json');
+    return fs.readFileAsync(pkgJsonPath).then(function(data) {
+      var pkg = JSON.parse(data);
+      var deps = pkg.dependencies;
+      if (cli['save-dev']) deps = pkg.devDependencies;
+      for (var i = 0, max = pkgs.length; i < max; i++) {
+        var dep = pkgs[i];
+        deps[dep.name] = '^' + dep.version;
+      }
+      return fs.writeFileAsync(pkgJsonPath, JSON.stringify(pkg, null, 2));
+    });
+  }
+}).then(function() {
+  screen.destroy();
+});
