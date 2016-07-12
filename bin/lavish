@@ -7,8 +7,8 @@ var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
 var exec = Promise.promisify(require('child_process').exec);
 var cli = require('minimist')(process.argv.slice(2), {
-  boolean: ['global', 'save', 'save-dev', '--production'],
-  alias: {'global': 'g', 'save-dev': 'd', 'save': 's'}
+  boolean: ['global', 'save', 'save-dev', 'production'],
+  alias: {'global': 'g', 'save-dev': 'd', 'save': 's', 'p': 'production'}
 });
 
 var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
