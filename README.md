@@ -1,4 +1,4 @@
-# lavish [![travis build][travis-icon]][travis]
+# lavish [![travis build][travis-icon]][travis] ![david dm][david-dm]
 > Better "npm install" using global cache and symlinking.
 
 Lavish downloads a flat package structure then uses symlinking for all dependencies.  After you download a package once or twice, it will symlink instantly from there on out.  This allows you to download less files and save time installing packages.
@@ -41,3 +41,4 @@ Should be 100% compatible with `npm install`.  Open an issue if you find incompa
 [usage-gif]: docs/usage.gif
 [travis-icon]: https://travis-ci.org/jamen/lavish.svg
 [travis]: https://travis-ci.org/jamen/lavish
+[david-dm]: https://david-dm.org/jamen/lavish.svg
