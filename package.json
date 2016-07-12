@@ -1,7 +1,7 @@
 {
   "name": "lavish",
   "author": "Jamen Marzonie",
-  "version": "0.0.0-alpha1",
+  "version": "0.1.0",
   "description": "More efficient \"npm install\" using globals dirs + symlinking.",
   "main": "lib",
   "repository": {
