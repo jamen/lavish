@@ -5,6 +5,7 @@ var cwd = process.cwd();
 var blessed = require('blessed');
 var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
+var exec = Promise.promisify(require('child_process').exec);
 var cli = require('minimist')(process.argv.slice(2), {
   boolean: ['global', 'save', 'save-dev', '--production'],
   alias: {'global': 'g', 'save-dev': 'd', 'save': 's'}
@@ -98,10 +99,20 @@ Promise.resolve(cli._).then(function(installs) {
   var name = parts[0];
   var tag = parts[1] || 'local-latest';
   return lavish.select(name, tag);
-}).all().map(function(pkg) {
+}).map(function(pkg) {
+  return Promise.all([pkg, exec('npm bin --global').then(function(data) {
+    return data.trim();
+  })]);
+}).map(function(items) {
+  var pkg = items[0];
+  var bin = items[1];
   return pkg.info().then(function(info) {
     createBox(info, pkg);
     return pkg.install(cwd);
+  }).then(function() {
+    if (cli.global) {
+      return pkg.bin(bin);
+    }
   }).then(function() {
     return pkg.info();
   });
