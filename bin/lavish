@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 var lavish = require('../lib');
 var Promise = require('bluebird');
-var cli = require('minimist')(process.argv.slice(2));
 var cwd = process.cwd();
 var blessed = require('blessed');
 var fs = Promise.promisifyAll(require('fs'));
 var path = require('path');
+var cli = require('minimist')(process.argv.slice(2), {
+  boolean: ['global', 'save', 'save-dev', '--production'],
+  alias: {'global': 'g', 'save-dev': 'd', 'save': 's'}
+});
 
 var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
 screen.title = 'lavish install';
@@ -74,9 +77,21 @@ Promise.resolve(cli._).then(function(installs) {
   if (installs.length) return installs;
   return fs.readFileAsync(path.join(cwd, 'package.json')).then(function(data) {
     var pkg = JSON.parse(data);
-    return Object.keys(pkg.dependencies).map(function(name) {
-      return name + '@' + pkg.dependencies[name];
-    });
+    var installs = [];
+
+    if (pkg.dependencies) {
+      Object.keys(pkg.dependencies).forEach(function(name) {
+        installs.push(name + '@' + pkg.dependencies[name]);
+      });
+    }
+
+    if (pkg.devDependencies && !cli.production) {
+      Object.keys(pkg.devDependencies).forEach(function(name) {
+        installs.push(name + '@' + pkg.devDependencies[name]);
+      });
+    }
+
+    return installs;
   });
 }).map(function(id) {
   var parts = id.split('@');
@@ -87,7 +102,23 @@ Promise.resolve(cli._).then(function(installs) {
   return pkg.info().then(function(info) {
     createBox(info, pkg);
     return pkg.install(cwd);
+  }).then(function() {
+    return pkg.info();
   });
+}).all().then(function(pkgs) {
+  if (cli.save || cli['save-dev']) {
+    var pkgJsonPath = path.join(cwd, 'package.json');
+    return fs.readFileAsync(pkgJsonPath).then(function(data) {
+      var pkg = JSON.parse(data);
+      var deps = pkg.dependencies;
+      if (cli['save-dev']) deps = pkg.devDependencies;
+      for (var i = 0, max = pkgs.length; i < max; i++) {
+        var dep = pkgs[i];
+        deps[dep.name] = '^' + dep.version;
+      }
+      return fs.writeFileAsync(pkgJsonPath, JSON.stringify(pkg, null, 2));
+    });
+  }
 }).then(function() {
   screen.destroy();
 });

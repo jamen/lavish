@@ -27,6 +27,7 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "bluebird": "^3.4.1",
+    "deep-assign": "^2.0.0",
     "json-assign": "^0.2.0",
     "mkdirp": "^0.5.1",
     "semver": "^5.2.0",
