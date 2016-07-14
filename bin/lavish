@@ -11,68 +11,68 @@ var cli = require('minimist')(process.argv.slice(2), {
   alias: {'global': 'g', 'save-dev': 'd', 'save': 's', 'p': 'production'}
 });
 
-var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
-screen.title = 'lavish install';
-
-var base = blessed.layout({
-  parent: screen,
-  top: 'center',
-  left: 'center',
-  width: '100%',
-  height: '100%',
-  padding: {left: 1, right: 1}
-});
-
-var createBox = function(info, pkg) {
-  var prefix = info.name + '@' + info.version + '\r\n';
-  var box = blessed.box({
-    width: '100%',
-    tags: true,
-    content: prefix + '{yellow-fg}Installing{/yellow-fg}',
-    padding: {bottom: 1}
-  });
-
-  base.append(box);
-  screen.render();
-
-  var message = function(color, x) {
-    box.setContent(prefix + '{' + color + '-fg}' + x + '{/' + color + '-fg}');
-    screen.render();
-  };
-
-  pkg.on('predownload', function() {
-    message('yellow', 'Downloading');
-  });
-
-  pkg.on('download', function() {
-    message('green', 'Downloaded');
-  });
-
-  pkg.on('prelink', function() {
-    message('yellow', 'Linking');
-  });
-
-  pkg.on('link', function() {
-    message('blue', 'Linked');
-  });
-
-  pkg.on('install', function() {
-    base.remove(box);
-    screen.render();
-  });
-
-  pkg.on('new dep', function(manager, dep) {
-    dep.info().then(function(info) {
-      var id = info.name + '@' + info.version;
-      message('yellow', 'Installing dependency ' + id);
-      createBox(info, dep);
-    });
-  });
-
-  pkg.on('error', function(err) {
-    message('red', 'Error: ' + err.message);
-  });
-};
+// var screen = blessed.screen({smartfastCSR: true, autoPadding: true});
+// screen.title = 'lavish install';
+//
+// var base = blessed.layout({
+//   parent: screen,
+//   top: 'center',
+//   left: 'center',
+//   width: '100%',
+//   height: '100%',
+//   padding: {left: 1, right: 1}
+// });
+//
+// var createBox = function(info, pkg) {
+//   var prefix = info.name + '@' + info.version + '\r\n';
+//   var box = blessed.box({
+//     width: '100%',
+//     tags: true,
+//     content: prefix + '{yellow-fg}Installing{/yellow-fg}',
+//     padding: {bottom: 1}
+//   });
+//
+//   base.append(box);
+//   screen.render();
+//
+//   var message = function(color, x) {
+//     box.setContent(prefix + '{' + color + '-fg}' + x + '{/' + color + '-fg}');
+//     screen.render();
+//   };
+//
+//   pkg.on('predownload', function() {
+//     message('yellow', 'Downloading');
+//   });
+//
+//   pkg.on('download', function() {
+//     message('green', 'Downloaded');
+//   });
+//
+//   pkg.on('prelink', function() {
+//     message('yellow', 'Linking');
+//   });
+//
+//   pkg.on('link', function() {
+//     message('blue', 'Linked');
+//   });
+//
+//   pkg.on('install', function() {
+//     base.remove(box);
+//     screen.render();
+//   });
+//
+//   pkg.on('new dep', function(manager, dep) {
+//     dep.info().then(function(info) {
+//       var id = info.name + '@' + info.version;
+//       message('yellow', 'Installing dependency ' + id);
+//       createBox(info, dep);
+//     });
+//   });
+//
+//   pkg.on('error', function(err) {
+//     message('red', 'Error: ' + err.message);
+//   });
+// };
 
 Promise.resolve(cli._).then(function(installs) {
   if (installs.length) return installs;
@@ -107,8 +107,8 @@ Promise.resolve(cli._).then(function(installs) {
   var pkg = items[0];
   var bin = items[1];
   return pkg.info().then(function(info) {
-    createBox(info, pkg);
-    return pkg.install(cwd);
+    // createBox(info, pkg);
+    return pkg.install(cwd).catch(console.error);
   }).then(function() {
     if (cli.global) {
       return pkg.bin(bin);
