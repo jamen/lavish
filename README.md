@@ -1,4 +1,6 @@
-# lavish [![travis build][travis-icon]][travis] ![david dm][david-dm]
+**Notice:** This repo is no longer maintained.  Contact me regarding the name or code.  This project was created in a time before Yarn, pnpm, ied, etc. or before I knew they existed.  I would use these better maintained alternatives instead.
+
+# lavish (Archived) [![travis build][travis-icon]][travis] ![david dm][david-dm]
 > Better "npm install" using global cache and symlinking.
 
 Lavish downloads a flat package structure then uses symlinking for all dependencies.  After you download a package once or twice, it will symlink instantly from there on out.  This allows you to download less files and save time installing packages.
